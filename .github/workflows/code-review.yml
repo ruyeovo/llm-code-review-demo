@@ -4,6 +4,7 @@ on:
   pull_request:
     types: [opened, synchronize]
 
+# 明确声明权限（你已经加过，这里保留）
 permissions:
   contents: read
   pull-requests: write
@@ -13,8 +14,25 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      # 1. 拉代码（必须）
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
+      # 2. 🔍 Debug：检查 OPENAI_API_KEY 是否真的注入
+      - name: Debug OPENAI_API_KEY presence
+        shell: bash
+        run: |
+          echo "==== DEBUG OPENAI_API_KEY ===="
+          if [ -z "${{ secrets.OPENAI_API_KEY }}" ]; then
+            echo "❌ OPENAI_API_KEY is EMPTY"
+            echo "This means GitHub did NOT inject the secret into this run."
+            exit 1
+          else
+            echo "✅ OPENAI_API_KEY is PRESENT"
+            echo "Length: ${#OPENAI_API_KEY}"
+          fi
+
+      # 3. 正式运行 LLM Code Reviewer（最小配置，避免干扰）
       - name: Run LLM Code Reviewer
         uses: tusgino/llm-code-reviewer@v1
         with:
