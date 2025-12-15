@@ -1,0 +1,21 @@
+name: LLM Code Review
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+
+jobs:
+  review:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Run LLM Code Reviewer
+        uses: tusgino/llm-code-reviewer@v1
+        with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+          # 你暂时可以先不填任何 API Key
+          # 后面我会解释如何加
