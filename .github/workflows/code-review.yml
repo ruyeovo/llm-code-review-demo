@@ -17,6 +17,4 @@ jobs:
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-          PRIMARY_MODEL: openai
-          OPENAI_MODEL: gpt-4o-mini
-          HUMAN_LANGUAGE: zh
+
