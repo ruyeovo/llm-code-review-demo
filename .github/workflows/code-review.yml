@@ -16,6 +16,7 @@ jobs:
         uses: tusgino/llm-code-reviewer@v1
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-          # 你暂时可以先不填任何 API Key
-          # 后面我会解释如何加
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          PRIMARY_MODEL: openai
+          OPENAI_MODEL: gpt-4o-mini
+          HUMAN_LANGUAGE: zh
