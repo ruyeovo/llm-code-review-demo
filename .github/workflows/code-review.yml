@@ -1,10 +1,9 @@
-name: LLM Code Review
+name: LLM Code Review (PR Target)
 
 on:
-  pull_request:
-    types: [opened, synchronize]
+  pull_request_target:
+    types: [opened, synchronize, reopened]
 
-# 明确声明权限（你已经加过，这里保留）
 permissions:
   contents: read
   pull-requests: write
@@ -14,27 +13,29 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # 1. 拉代码（必须）
-      - name: Checkout repository
+      - name: Checkout base branch (safe for conflicts)
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.base.ref }}
 
-      # 2. 🔍 Debug：检查 OPENAI_API_KEY 是否真的注入
-      - name: Debug OPENAI_API_KEY presence
-        shell: bash
+      - name: Debug trigger
         run: |
-          echo "==== DEBUG OPENAI_API_KEY ===="
+          echo "EVENT = ${{ github.event_name }}"
+          echo "PR = #${{ github.event.pull_request.number }}"
+          echo "BASE = ${{ github.event.pull_request.base.ref }}"
+          echo "HEAD = ${{ github.event.pull_request.head.ref }}"
+
+      - name: Debug OPENAI_API_KEY presence
+        run: |
           if [ -z "${{ secrets.OPENAI_API_KEY }}" ]; then
             echo "❌ OPENAI_API_KEY is EMPTY"
-            echo "This means GitHub did NOT inject the secret into this run."
             exit 1
           else
             echo "✅ OPENAI_API_KEY is PRESENT"
-            echo "Length: ${#OPENAI_API_KEY}"
           fi
 
-      # 3. 正式运行 LLM Code Reviewer（最小配置，避免干扰）
       - name: Run LLM Code Reviewer
         uses: tusgino/llm-code-reviewer@v1
         with:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ github.token }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
